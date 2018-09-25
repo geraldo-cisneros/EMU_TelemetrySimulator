@@ -1,0 +1,7 @@
+DCU Switches:
+1. Battery/suit power
+2. Secondary 02 or 02
+3. Pump
+4. Fan
+5. RCA - CO2/TM
+6. 
