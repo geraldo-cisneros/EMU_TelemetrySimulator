@@ -30,7 +30,7 @@ var suitTelemetrySchema = new mongoose.Schema({
 });
 var SuitData = mongoose.model('Gateway', suitTelemetrySchema,);
 
-module.exports.suitTelemetry = function(t,d ){
+module.exports.suitTelemetry = function(t,d){
     var switchIn =  SuitData({
         heart_bpm: heartBeat(),
         p_sub: pressureSUB(),
