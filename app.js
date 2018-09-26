@@ -7,25 +7,6 @@ var interval_switch;
 var urlencodeParser = bodyParser.urlencoded({extended: false});
 var decider = false;
 var time = Date.now();
-var switchInput = app.get('/save', function(req,res){
-
-
-    var switchInput = { 
-         sw1: req.query.switch1,
-         sw2: req.query.switch2,
-         sw3: req.query.switch3,
-         sw4: req.query.switch4,
-         sw5: req.query.switch5,
-         sw6: req.query.switch6,
-     }
- 
-     Simulation.suitTelemetry(switchInput,time,decider);
-     //InputSwitch.inputSwitch(switchInput);s
-     
-     console.log(switchInput);
-     res.send(switchInput); 
-     return switchInput;
- });
 
 /* var http = require('http').createServer(handler); //require http server, and create server with function handler()
 var fs = require('fs'); //require filesystem module
@@ -72,7 +53,7 @@ app.get('/',function(req, res){
 app.post('/', urlencodeParser, function(req, res){
     console.log("--------------Simulation started--------------")
     var time = Date.now(); 
-    interval = setInterval(Simulation.suitTelemetry.bind(switchInput,time,decider),1000);
+    interval = setInterval(Simulation.suitTelemetry.bind(decider, time),1000);
     interval_switch = setInterval(SuitSwitch.SuitSwitch,1000);
     res.render('contact',{qs: ""});
 });
@@ -144,8 +125,8 @@ app.post('/error-ready',urlencodeParser, function(req, res){
     decider = true; 
 
     //Start alternative simulation
-    interval = setInterval(Simulation.suitTelemetry.bind(switchInput, time, decider),1000);
-    interval_switch = setInterval(SuitSwitch.SuitSwitch.bind(switchInput,time,decider),1000);
+    interval = setInterval(Simulation.suitTelemetry.bind(null, time, decider),1000);
+    interval_switch = setInterval(SuitSwitch.SuitSwitch.bind(null,time,decider),1000);
 
     res.render('error_resolver',{qs: req.query});
 })
@@ -156,7 +137,25 @@ app.get('/error-ready',function(req, res){
 
 //********************************************************Raspberry Pi Commands*************************************************************
 // receive command from pi pass that argument to tha suit telemetry 
+app.get('/save', function(req,res){
 
+
+    var switchInput = { 
+         sw1: 'true',
+         sw2: req.query.switch2,
+         sw3: req.query.switch3,
+         sw4: req.query.switch4,
+         sw5: req.query.switch5,
+         sw6: req.query.switch6,
+     }
+ 
+     InputSwitch.inputSwitch(switchInput);
+     //InputSwitch.inputSwitch(switchInput);
+     
+     console.log(switchInput);
+     res.send(switchInput); 
+     return switchInput;
+ });
 
 
 

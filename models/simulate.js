@@ -30,7 +30,7 @@ var suitTelemetrySchema = new mongoose.Schema({
 });
 var SuitData = mongoose.model('Gateway', suitTelemetrySchema,);
 
-module.exports.suitTelemetry = function(s,t,d){
+module.exports.suitTelemetry = function(t,d ){
     var switchIn =  SuitData({
         heart_bpm: heartBeat(),
         p_sub: pressureSUB(),
@@ -38,7 +38,7 @@ module.exports.suitTelemetry = function(s,t,d){
         v_fan: velocFan(d),
         p_o2:pressureOxygen(),
         rate_o2:rateOxygen(),
-        cap_battery:capacityBattery(t,s),
+        cap_battery:capacityBattery(t),
         p_h2o_g:pressureWaterGas(),
         p_h2o_l:pressureWaterLiquid(),
         p_sop:pressureSOP(),
@@ -50,14 +50,10 @@ module.exports.suitTelemetry = function(s,t,d){
         }).save(function(err){
              if (err) 
              throw (err); 
-             console.log(s,t,d)
+             console.log(t,d)
 
-       });
-     
-    
+       });   
 }
-
-
 function padValues(n, width, z) {
     z = z || '0';
     n = n + '';
@@ -79,11 +75,13 @@ function remaining(d) {
     return m
 }
  
-function batteryLife(t,s){  
+function batteryLife(t,){  
     var elapsed = Date.now() - t;
     t_remaining = fullTime - elapsed; 
     t_battery = secondsToHms(Math.floor(t_remaining/1000));
    //console.log(Math.floor(elapsed/1000) + ' s');
+
+  
 
     
     
