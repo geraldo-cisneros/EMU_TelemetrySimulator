@@ -9,6 +9,21 @@ const router = express.Router()
 
 //Router for simulation
 router.use(bodyParser.urlencoded({extended: false}))
+router.use(bodyParser.json())
+router.use((req,res,next) =>{
+	res.setHeader(
+		'Access-Control-Allow-Origin', '*'
+	)
+	res.setHeader(
+		'Access-Control-Allow-Headers',
+		'Origin, X-Requested-Width, Content-Type, Accept'
+	)
+	res.setHeader(
+		'Access-Control-Allow-Methods',
+		'GET, POST, PATCH, DELETE, OPTIONS'
+	)
+	next()
+})
 
 router.post('/start', async (req, res) => {
 	try{
@@ -20,35 +35,63 @@ router.post('/start', async (req, res) => {
 		console.error(error.toString())
 		res.sendStatus(500)
 	}
-
 })
-
 router.post('/stop', async (req, res) => {
-	await simulation.stop()
-	res.sendStatus(204)
+	try{ 
+		await simulation.stop()
+		res.sendStatus(204)
+	}
+	catch (error){
+		console.error('failed to stop simulation')
+		console.error(error.toString())
+		res.sendStatus(500)
+	}
 })
-
 router.post('/pause', async (req, res) => {
-	await simulation.pause()
-	res.sendStatus(204)
+	try{ 
+		await simulation.pause()
+		res.sendStatus(204)
+	}
+	catch(error){
+		console.error('failed to pause simulation')
+		console.error(error.toString())
+		res.sendStatus(500)
+	}
 })
-
 router.post('/unpause', async (req, res) => {
-	await simulation.unpause()
-	res.sendStatus(204)
+	try{ 
+		await simulation.unpause()
+		res.sendStatus(204)
+	}
+	catch(error){		
+		console.error('failed to unpause simulation')
+		console.error(error.toString())
+		res.sendStatus(500)
+	}
 })
-
 router.get('/state', async (req, res) => {
-	const state = await simulation.getState()
-	res.json(state)
+	try{
+		const state = await simulation.getState()
+		res.json(state)
+		//console.log(state)
+	}
+	catch(error){
+		console.error('failed to start get state')
+		console.error(error.toString())
+		res.sendStatus(500)
+	}
 })
-
-
 router.get('/controls', async (req, res) => {
-	const controls = await simulation.getControls()
-	res.json(controls)
+	try{
+		const controls = await simulation.getControls()
+		res.json(controls)
+	}
+	catch(error){
+		console.error('failed to get controls')
+		console.error(error.toString())
+		res.sendStatus(500)
+	}
 })
-
 //TODO: update python script for correct request 
 router.patch('/controls', async (req, res) => {
 	const newControls = req.body

@@ -10,6 +10,6 @@ var SimulationControlSchema = new Schema({
 	switch4: Boolean,
 	switch5: Boolean,
 	switch6: Boolean,
-	failureMode: Boolean
+	failure: Boolean
 })
 module.exports = mongoose.model('SimulationControl', SimulationControlSchema)

@@ -24,6 +24,7 @@ module.exports.start = async function(){
 	try {
 		const started_at = new Date()
 		const state = await SimulationState.create({
+			time: 10800,
 			started_at,
 			heart_bpm: 0,
 			p_sub: 0,
@@ -31,15 +32,15 @@ module.exports.start = async function(){
 			v_fan: 0,
 			p_o2: 0,
 			rate_o2: 0,
-			cap_battery: 0,
-			t_battery: 0,
+			cap_battery: 100,
+			t_battery: 3 * 60 * 60,
 			p_h2o_g: 0,
 			p_h2o_l: 0,
 			p_sop: 0,
 			rate_sop:0 ,
-			t_oxygen: 0,
-			t_oxygenSec: 0,
-			t_water: 0,
+			t_oxygen: 100,
+			t_oxygenSec: 100,
+			t_water: 32,//ounces
 		})
 		simStateID = state._id 
 		const controls = await SimulationControl.create({
@@ -50,8 +51,8 @@ module.exports.start = async function(){
 			switch3: false,
 			switch4: false,
 			switch5: false,
-			switch6: false,
-			failure_mode: false
+			switch6: true,
+			failure: false
 		})
 		controlID = controls._id
 		console.log('--------------Simulation started--------------')
@@ -114,16 +115,15 @@ module.exports.setControls = async function(newControls){
 }
 
 async function step(){
-	// const oldSimState = await SimulationState.find({},{_id:0, __v:0}).sort({'create_date':-1}).limit(1).exec()
-	// const controls = await SimulationControl.find({},{_id:0, __v:0}).sort({'create_date':-1}).limit(1).exec()
 	try{
 		const simState = await SimulationState.findById(simStateID).exec()
 		const controls = await SimulationControl.findById(controlID).exec()
 		const now = Date.now()
 		const dt = now - lastTimestamp 
 		lastTimestamp = now
+		console.log(lastTimestamp)
+		console.log(dt)
 		const newSimState = simulationStep(dt, controls, simState)
-		// simState.heart_bpm = newSimState.heart_bpm
 		Object.assign(simState, newSimState)
 		await simState.save()
 	}

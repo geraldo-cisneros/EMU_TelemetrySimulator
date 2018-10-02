@@ -28,8 +28,7 @@ var pushButton = new Gpio(17, 'in', 'both'); //use GPIO pin 17 as input, and 'bo
 /* const simulation = require('./controllers/simulation')
 SuitSwitch = require('./models/suitswitch')
 InputSwitch = require('./models/inputswitch')
-
-
+*/
 
 
 //EJS framework for website display
@@ -49,9 +48,11 @@ app.use((req,res,next) =>{
 	next()
 })
 
+
 app.set('view engine', 'ejs')
 app.use('/assets', express.static('assets'))
 
+/*
 //ROUTES
 app.get('/',function(req, res){
 	res.render('index')
