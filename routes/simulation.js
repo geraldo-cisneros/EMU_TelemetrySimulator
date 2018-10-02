@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 require('../models/SimulationState')
 require('../models/SimulationControl')
+require('../models/SimulationFailure')
 
 const simulation = require('../controllers/simulation')
 
@@ -81,6 +82,17 @@ router.get('/state', async (req, res) => {
 		res.sendStatus(500)
 	}
 })
+router.get('/failure', async (req, res) => {
+	try{
+		const failure = await simulation.getFailure()
+		res.json(failure)
+	}
+	catch(error){
+		console.error('failed to start get failure')
+		console.error(error.toString())
+		res.sendStatus(500)
+	}
+})
 router.get('/controls', async (req, res) => {
 	try{
 		const controls = await simulation.getControls()
@@ -93,10 +105,10 @@ router.get('/controls', async (req, res) => {
 	}
 })
 //TODO: update python script for correct request 
-router.patch('/controls', async (req, res) => {
-	const newControls = req.body
+router.patch('/newcontrols', async (req, res) => {
+	const newControls = req.query
 	console.log(newControls)
-	const state = await simulation.setState(newControls)
+	const state = await simulation.setControls(newControls)
 	res.json(state)
 })
 

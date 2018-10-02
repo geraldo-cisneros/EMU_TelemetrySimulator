@@ -1,12 +1,12 @@
 
-module.exports.simulationStep = function(dt, controls, oldSimState){
+module.exports.simulationStep = function(dt, controls, failure, oldSimState){
 
 	// SimulationState.create({
 	return {
 		heart_bpm: heartBeat(dt, controls, oldSimState),
 		p_sub: pressureSUB(dt, controls, oldSimState),
 		t_sub: tempSub(dt, controls, oldSimState),
-		v_fan: velocFan(dt, controls, oldSimState),
+		v_fan: velocFan(dt, controls, failure, oldSimState),
 		p_o2: pressureOxygen(dt, controls, oldSimState),
 		rate_o2: rateOxygen(dt, controls, oldSimState),
 		cap_battery: batteryStep(dt, controls, oldSimState).cap_battery.toFixed(2),
@@ -21,6 +21,7 @@ module.exports.simulationStep = function(dt, controls, oldSimState){
 
 	}
 }
+
 
 function padValues(n, width, z = '0') {
 	n = n.toString()
@@ -74,7 +75,7 @@ function oxygenLife(dt, { O2_switch }, oldSimState){
 	return {t_oxygenPrimary, t_oxygenSecondary}
 }
 
-function waterLife(dt,controls,oldSimState){
+function waterLife(dt, controls, oldSimState){
 	const water_drainRate =  100 / ( 3 * 60 * 60) //(oz/s)
 	const amountDrained = water_drainRate * (dt / 1000)
 	let t_water = oldSimState.t_water - amountDrained
@@ -107,12 +108,11 @@ function tempSub(){
 }
 
 
-function velocFan(dt, { failure, switch6 }, oldSimState){
+function velocFan(dt, { fan_switch }, { fan_error }, oldSimState){
 	let v_fan = oldSimState.v_fan
 	let fan_max = 0
 	let fan_min = 0
-	
-	if (failure === true && switch6 === true) { 
+	if (fan_error === true && fan_switch === true) { 
 		if (v_fan > 2000){
 			v_fan = v_fan - 303 
 			return v_fan.toFixed(0)  
@@ -120,16 +120,16 @@ function velocFan(dt, { failure, switch6 }, oldSimState){
 		fan_max = 1789 
 		fan_min = 879
 	} 
-	else if(failure === false && switch6 === true) {
+	else if(fan_error === false && fan_switch === true) {
 		fan_max = 40000 
 		fan_min = 39900 
 	}
-	else if (switch6 === false ){
+	else if (fan_switch === false ){
 		v_fan = 0
 	}
 
 	v_fan = Math.random() * (fan_max - fan_min) + fan_min
-	return v_fan.toFixed(0) 
+	return v_fan.toFixed(0)
 }
 
 function pressureOxygen(){

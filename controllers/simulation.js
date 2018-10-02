@@ -2,10 +2,12 @@ var mongoose = require('mongoose')
 const { simulationStep } = require('./simulate')
 var SimulationState = mongoose.model('SimulationState')	
 var SimulationControl = mongoose.model('SimulationControl')
+var SimulationFailure = mongoose.model('SimulationFailure')
 
 let simTimer = null
 let simStateID = null
 let controlID = null 
+let failureID = null
 let lastTimestamp = null
 
 function isRunning() {
@@ -15,7 +17,6 @@ function isRunning() {
 function isPaused() {
 	return simTimer !== null
 }
-
 
 module.exports.start = async function(){
 	if (isRunning()){
@@ -44,17 +45,22 @@ module.exports.start = async function(){
 		})
 		simStateID = state._id 
 		const controls = await SimulationControl.create({
-			started_at,
 			//names are temporary... change when switch functions are decided
-			switch1: false,
-			switch2: false,
+			started_at,
+			battery_switch: false,
+			O2_switch: false,
 			switch3: false,
 			switch4: false,
 			switch5: false,
-			switch6: true,
-			failure: false
+			fan_switch: true,
 		})
 		controlID = controls._id
+		const failure = await SimulationFailure.create({
+			started_at,
+			fan_error: false, 
+		})
+		failureID = failure._id
+
 		console.log('--------------Simulation started--------------')
 		lastTimestamp = Date.now()
 		simTimer = setInterval(step, 1000)
@@ -65,7 +71,6 @@ module.exports.start = async function(){
 		throw error 
 	}
 }
-
 
 module.exports.pause = function(){
 	if (!isRunning() || isPaused()) {
@@ -109,6 +114,11 @@ module.exports.getControls = async function(){
 	return controls 
 }
 
+module.exports.getFailure = async function(){
+	const failure = await SimulationFailure.findById(failureID).exec()
+	return failure
+}
+
 module.exports.setControls = async function(newControls){
 	const controls = await SimulationControl.findByIdAndUpdate(controlID, newControls, {new: true}).exec()
 	return controls 
@@ -118,12 +128,13 @@ async function step(){
 	try{
 		const simState = await SimulationState.findById(simStateID).exec()
 		const controls = await SimulationControl.findById(controlID).exec()
+		const failure = await SimulationFailure.findById(failureID).exec()
 		const now = Date.now()
 		const dt = now - lastTimestamp 
 		lastTimestamp = now
 		console.log(lastTimestamp)
 		console.log(dt)
-		const newSimState = simulationStep(dt, controls, simState)
+		const newSimState = simulationStep(dt, controls, failure, simState)
 		Object.assign(simState, newSimState)
 		await simState.save()
 	}
