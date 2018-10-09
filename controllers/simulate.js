@@ -18,7 +18,6 @@ module.exports.simulationStep = function(dt, controls, failure, oldSimState){
 		t_oxygen: oxygenLife(dt, controls, oldSimState).t_oxygenPrimary,
 		t_oxygenSec: oxygenLife(dt, controls, oldSimState).t_oxygenSecondary,
 		t_water: waterLife(dt, controls, oldSimState)
-
 	}
 }
 
@@ -62,15 +61,15 @@ function oxygenLife(dt, { O2_switch }, oldSimState){
 	// const drainRate_high = totalBatteryCapacity / totalBatteryLife_high
 	// const drainRate = controls.switch1 ? drainRate_high : drainRate_low // kA/s
 	const ox_drainRate= 100 / ( 3 * 60 * 60) // 3 hours of life (%/s)
-	const amountDrained = ox_drainRate * (dt / 1000)// %
+	const amountDrained = ox_drainRate * ( dt / 1000 )// %
 	let t_oxygenPrimary = oldSimState.t_oxygen
 	let t_oxygenSecondary = oldSimState.t_oxygenSec
 
 	if (O2_switch){
-		t_oxygenPrimary = (t_oxygenPrimary - amountDrained).toFixed(2)// %
+		t_oxygenPrimary = ( t_oxygenPrimary - amountDrained ).toFixed(2) // %
 	}
 	else{
-		t_oxygenSecondary = (t_oxygenSecondary - amountDrained).toFixed(2) // %
+		t_oxygenSecondary = ( t_oxygenSecondary - amountDrained ).toFixed(2) // %
 	}
 	return {t_oxygenPrimary, t_oxygenSecondary}
 }
@@ -83,7 +82,7 @@ function waterLife(dt, controls, oldSimState){
 	console.log(amountDrained)
 	console.log(t_water)
 	
-	return t_water
+	return t_water.toFixed(2)
 }
 
 function heartBeat(){
@@ -155,8 +154,8 @@ function pressureWaterGas(){
 
 function pressureWaterLiquid(){
 	const waterPressure_max = 16 
-	const waterPressuer_min = 15 
-	const p_h2o_l = Math.random() * (waterPressure_max - waterPressuer_min) + waterPressuer_min
+	const waterPressure_min = 15 
+	const p_h2o_l = Math.random() * (waterPressure_max - waterPressure_min) + waterPressure_min
 	return p_h2o_l.toFixed(0) 
 }
 
