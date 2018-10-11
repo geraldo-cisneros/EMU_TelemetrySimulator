@@ -1,32 +1,55 @@
 
 module.exports.simulationStep = function(dt, controls, failure, oldSimState){
 
-	// SimulationState.create({
-	return {
-		heart_bpm: heartBeat(dt, controls, oldSimState),
-		p_sub: pressureSUB(dt, controls, oldSimState),
-		t_sub: tempSub(dt, controls, oldSimState),
-		v_fan: velocFan(dt, controls, failure, oldSimState),
-		p_o2: pressureOxygen(dt, controls, oldSimState),
-		rate_o2: rateOxygen(dt, controls, oldSimState),
-		cap_battery: batteryStep(dt, controls, oldSimState).cap_battery.toFixed(2),
-		t_battery: batteryStep(dt, controls, oldSimState).t_battery,
-		p_h2o_g: pressureWaterGas(dt, controls, oldSimState),
-		p_h2o_l: pressureWaterLiquid(dt, controls, oldSimState),
-		p_sop: pressureSOP(dt, controls, oldSimState),
-		rate_sop: rateSOP(dt, controls, oldSimState),
-		t_oxygen: oxygenLife(dt, controls, oldSimState).t_oxygenPrimary,
-		t_oxygenSec: oxygenLife(dt, controls, oldSimState).t_oxygenSecondary,
-		t_water: waterLife(dt, controls, oldSimState)
+	const cap_battery = batteryStep(dt, controls, oldSimState).cap_battery.toFixed(2)
+	const t_battery = batteryStep(dt, controls, oldSimState).t_battery
 
+	if (controls.battery_switch) //determines whether the Suit is on/off
+	// SimulationState.create({
+		return {
+			heart_bpm: heartBeat(dt, controls, oldSimState),
+			p_sub: pressureSUB(dt, controls, oldSimState),
+			t_sub: tempSub(dt, controls, oldSimState),
+			v_fan: velocFan(dt, controls, failure, oldSimState),
+			p_o2: pressureOxygen(dt, controls, oldSimState),
+			rate_o2: rateOxygen(dt, controls, oldSimState),
+			cap_battery,
+			t_battery,
+			p_h2o_g: pressureWaterGas(dt, controls, oldSimState),
+			p_h2o_l: pressureWaterLiquid(dt, controls, oldSimState),
+			p_sop: pressureSOP(dt, controls, oldSimState),
+			rate_sop: rateSOP(dt, controls, oldSimState),
+			t_oxygen: oxygenLife(dt, controls, oldSimState).t_oxygenPrimary,
+			t_oxygenSec: oxygenLife(dt, controls, oldSimState).t_oxygenSecondary,
+			t_water: waterLife(dt, controls, oldSimState)
+		}
+	else{
+		return{
+			heart_bpm: 0,
+			p_sub: 0, 
+			t_sub: 0, 
+			v_fan: 0, 
+			p_o2: 0, 
+			rate_o2: 0,
+			cap_battery,
+			t_battery,
+			p_h2o_g: 0,
+			p_h2o_l: 0,
+			p_sop: 0, 
+			rate_sop: 0,
+			t_oxygen: oldSimState.t_oxygen, 
+			t_oxygenSec: oldSimState.t_oxygenSec, 
+			t_water: 0, 
+
+		}
 	}
 }
-
 
 function padValues(n, width, z = '0') {
 	n = n.toString()
 	return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n
 }
+
 function secondsToHms(dt) {
 	dt = Number(dt)
 	var h = Math.floor(dt / 3600)
@@ -44,14 +67,17 @@ function batteryStep(dt, { battery_switch }, oldSimState){
 	// const drainRate_low = totalBatteryCapacity / totalBatteryLife_low
 	// const drainRate_high = totalBatteryCapacity / totalBatteryLife_high
 	// const drainRate = controls.battery_switch ? drainRate_high : drainRate_low // kA/s
-	const drainRate_low = 100 / (4 * 60 * 60) // 4 hours of life (%/s)
-	const drainRate_high = 100 / (2 * 60 * 60) // 2 hours of battery life (%/s)
-	const drainRate = battery_switch ? drainRate_high : drainRate_low // %/s
-
+	const drainRate = 100 / (4 * 60 * 60) // 4 hours of life (%/s)
+	//const drainRate_high = 100 / (2 * 60 * 60) // 2 hours of battery life (%/s)
+	//const drainRate = battery_switch ? drainRate_high : drainRate_low // %/s
+	let cap_battery = oldSimState.cap_battery
 	const amountDrained = drainRate * (dt / 1000) // %
-	const cap_battery = oldSimState.cap_battery - amountDrained// %
 	const t_battery = secondsToHms(cap_battery / drainRate) // s
-	return { cap_battery, t_battery }
+	if (battery_switch){
+		cap_battery = cap_battery - amountDrained// %
+	}
+	console.log(t_battery)
+	return { cap_battery , t_battery }
 }
 
 function oxygenLife(dt, { O2_switch }, oldSimState){
@@ -62,15 +88,15 @@ function oxygenLife(dt, { O2_switch }, oldSimState){
 	// const drainRate_high = totalBatteryCapacity / totalBatteryLife_high
 	// const drainRate = controls.switch1 ? drainRate_high : drainRate_low // kA/s
 	const ox_drainRate= 100 / ( 3 * 60 * 60) // 3 hours of life (%/s)
-	const amountDrained = ox_drainRate * (dt / 1000)// %
+	const amountDrained = ox_drainRate * ( dt / 1000)// %
 	let t_oxygenPrimary = oldSimState.t_oxygen
 	let t_oxygenSecondary = oldSimState.t_oxygenSec
 
 	if (O2_switch){
-		t_oxygenPrimary = (t_oxygenPrimary - amountDrained).toFixed(2)// %
+		t_oxygenPrimary = ( t_oxygenPrimary - amountDrained ).toFixed(2) // %
 	}
 	else{
-		t_oxygenSecondary = (t_oxygenSecondary - amountDrained).toFixed(2) // %
+		t_oxygenSecondary = ( t_oxygenSecondary - amountDrained ).toFixed(2) // %
 	}
 	return {t_oxygenPrimary, t_oxygenSecondary}
 }
@@ -79,11 +105,11 @@ function waterLife(dt, controls, oldSimState){
 	const water_drainRate =  100 / ( 3 * 60 * 60) //(oz/s)
 	const amountDrained = water_drainRate * (dt / 1000)
 	let t_water = oldSimState.t_water - amountDrained
-	console.log( oldSimState.t_water - amountDrained)
-	console.log(amountDrained)
-	console.log(t_water)
+	// console.log( oldSimState.t_water - amountDrained)
+	// console.log(amountDrained)
+	// console.log(t_water)
 	
-	return t_water
+	return t_water.toFixed(2)
 }
 
 function heartBeat(){
@@ -107,7 +133,6 @@ function tempSub(){
 	return t_sub.toFixed(0) 
 }
 
-
 function velocFan(dt, { fan_switch }, { fan_error }, oldSimState){
 	let v_fan = oldSimState.v_fan
 	let fan_max = 0
@@ -127,7 +152,6 @@ function velocFan(dt, { fan_switch }, { fan_error }, oldSimState){
 	else if (fan_switch === false ){
 		v_fan = 0
 	}
-
 	v_fan = Math.random() * (fan_max - fan_min) + fan_min
 	return v_fan.toFixed(0)
 }
@@ -155,8 +179,8 @@ function pressureWaterGas(){
 
 function pressureWaterLiquid(){
 	const waterPressure_max = 16 
-	const waterPressuer_min = 15 
-	const p_h2o_l = Math.random() * (waterPressure_max - waterPressuer_min) + waterPressuer_min
+	const waterPressure_min = 15 
+	const p_h2o_l = Math.random() * (waterPressure_max - waterPressure_min) + waterPressure_min
 	return p_h2o_l.toFixed(0) 
 }
 
