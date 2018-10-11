@@ -4,7 +4,7 @@ module.exports.simulationStep = function(dt, controls, failure, oldSimState){
 	const cap_battery = batteryStep(dt, controls, oldSimState).cap_battery.toFixed(2)
 	const t_battery = batteryStep(dt, controls, oldSimState).t_battery
 
-	if (controls.battery_switch)
+	if (controls.battery_switch) //determines whether the Suit is on/off
 	// SimulationState.create({
 		return {
 			heart_bpm: heartBeat(dt, controls, oldSimState),
