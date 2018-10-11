@@ -33,7 +33,7 @@ module.exports.start = async function(){
 			v_fan: 0,
 			p_o2: 0,
 			rate_o2: 0,
-			cap_battery: 100,
+			cap_battery: 100.00,
 			t_battery: 3 * 60 * 60,
 			p_h2o_g: 0,
 			p_h2o_l: 0,

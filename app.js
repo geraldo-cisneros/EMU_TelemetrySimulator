@@ -5,7 +5,6 @@ var app = express()
 const simulationRouter = require('./routes/simulation')
 //Database connector
 mongoose.connect('mongodb://localhost/spacesuit')
-
 app.use('/api/simulation', simulationRouter)
 
 //EJS framework for website display
@@ -24,7 +23,7 @@ app.use((req,res,next) =>{
 	)
 	next()
 })
-app.set('view engine', 'ejs')
+app.set('view engine', 'ejs') 
 app.use('/assets', express.static('assets'))
 app.listen(3000) //listen to port 3000
 console.log('Server is running on port 3000...')
