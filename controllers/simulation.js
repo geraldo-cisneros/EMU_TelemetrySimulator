@@ -1,21 +1,23 @@
 var mongoose = require('mongoose')
-const { simulationStep } = require('./simulate')
+const { simulationStep } = require('./telemetry')
 var SimulationState = mongoose.model('SimulationState')	
 var SimulationControl = mongoose.model('SimulationControl')
 var SimulationFailure = mongoose.model('SimulationFailure')
+var SimulationHold = mongoose.model('SimulationHold')
 
 let simTimer = null
 let simStateID = null
 let controlID = null 
 let failureID = null
+let holdID = null
 let lastTimestamp = null
 
 function isRunning() {
-	return simStateID !== null && controlID !== null
+	return simStateID !== null && controlID !== null && failureID !== null && holdID !== null
 }
 
 function isPaused() {
-	return simTimer !== null
+	return simTimer == null
 }
 
 module.exports.start = async function(){
@@ -25,15 +27,17 @@ module.exports.start = async function(){
 	try {
 		const started_at = new Date()
 		const state = await SimulationState.create({
-			time: 10800,
+			time: 0,
+			timer: 0, 
 			started_at,
-			heart_bpm: 0,
+			heart_bpm: 80,
 			p_sub: 0,
 			t_sub: 0,
 			v_fan: 0,
 			p_o2: 0,
 			rate_o2: 0,
-			cap_battery: 100.00,
+			cap_battery: 100,
+			battery_out: 100, 
 			t_battery: 3 * 60 * 60,
 			p_h2o_g: 0,
 			p_h2o_l: 0,
@@ -41,13 +45,15 @@ module.exports.start = async function(){
 			rate_sop:0 ,
 			t_oxygen: 100,
 			t_oxygenSec: 100,
+			ox_primary:100,
+			ox_secondary:100, 
 			t_water: 32,//ounces
 		})
 		simStateID = state._id 
 		const controls = await SimulationControl.create({
 			//names are temporary... change when switch functions are decided
 			started_at,
-			battery_switch: false,
+			battery_switch: true,
 			O2_switch: false,
 			switch3: false,
 			switch4: false,
@@ -60,8 +66,13 @@ module.exports.start = async function(){
 			fan_error: false, 
 		})
 		failureID = failure._id
+		const hold = await SimulationHold.create({
+			started_at,
+			handhold: 0, 
+		})
+		holdID = hold._id
 
-		console.log('--------------Simulation started--------------')
+		console.log('--------------Simulation Started--------------')
 		lastTimestamp = Date.now()
 		simTimer = setInterval(step, 1000)
 	}
@@ -74,9 +85,9 @@ module.exports.start = async function(){
 
 module.exports.pause = function(){
 	if (!isRunning() || isPaused()) {
-		throw new Error('Cannot pause: simulation is not running or is running but paused')
+		throw new Error('Cannot pause: simulation is not running or it is running and is already paused')
 	}
-	console.log('--------------Simulation paused-------------')
+	console.log('--------------Simulation Paused-------------')
 
 	clearInterval(simTimer)
 	simTimer = null 
@@ -85,9 +96,9 @@ module.exports.pause = function(){
 
 module.exports.unpause = function(){
 	if (!isRunning() || !isPaused()) {
-		throw new Error('Cannot unpause: simulation is not running and paused')
+		throw new Error('Cannot unpause: simulation is not running or it is running and is not paused')
 	}
-	console.log('--------------Simulation unpaused-------------')
+	console.log('--------------Simulation Resumed-------------')
 	lastTimestamp = Date.now()
 	simTimer = setInterval(step, 1000)
 }
@@ -97,7 +108,7 @@ module.exports.stop = function(){
 	if (!isRunning()) {
 		throw new Error('Cannot stop: simulation is not running')
 	}
-	console.log('--------------Simulation stopped-------------')
+	console.log('--------------Simulation Stopped-------------')
 	simStateID = null
 	controlID = null 
 	clearInterval(simTimer)
@@ -119,9 +130,21 @@ module.exports.getFailure = async function(){
 	return failure
 }
 
+module.exports.setFailure = async function(newFailure){
+	const failure = await SimulationFailure.findByIdAndUpdate(failureID, newFailure, {new: true}).exec()
+	return failure
+}
+
 module.exports.setControls = async function(newControls){
 	const controls = await SimulationControl.findByIdAndUpdate(controlID, newControls, {new: true}).exec()
 	return controls 
+}
+
+module.exports.setHold = async function(newHold){
+	const hold = await SimulationHold.findByIdAndUpdate(holdID, newHold, {new: true}).exec()
+	console.log(hold)
+	console.log('set hold click worked')
+	return hold 
 }
 
 async function step(){
@@ -129,11 +152,10 @@ async function step(){
 		const simState = await SimulationState.findById(simStateID).exec()
 		const controls = await SimulationControl.findById(controlID).exec()
 		const failure = await SimulationFailure.findById(failureID).exec()
+		// const hold = await SimulationHold.findById(holdID).exec()
 		const now = Date.now()
 		const dt = now - lastTimestamp 
 		lastTimestamp = now
-		console.log(lastTimestamp)
-		console.log(dt)
 		const newSimState = simulationStep(dt, controls, failure, simState)
 		Object.assign(simState, newSimState)
 		await simState.save()
