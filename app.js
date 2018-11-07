@@ -2,7 +2,7 @@ var express = require('express')
 var bodyParser = require('body-parser')
 var mongoose = require('mongoose')
 var app = express()
-const simulationRouter = require('./routes/simulation')
+const simulationRouter = require('./routes/router')
 //Database connector
 mongoose.connect('mongodb://localhost/spacesuit')
 app.use('/api/simulation', simulationRouter)

@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 require('../models/SimulationState')
 require('../models/SimulationControl')
 require('../models/SimulationFailure')
-
+require('../models/SimulationHold')
 const simulation = require('../controllers/simulation')
 
 const router = express.Router()
@@ -104,11 +104,24 @@ router.get('/controls', async (req, res) => {
 		res.sendStatus(500)
 	}
 })
-//TODO: update python script for correct request 
+router.patch('/hand-hold', async (req, res) => {
+	const newHold = req.query
+	console.log(newHold)
+	const hold = await simulation.setHold(newHold)
+	res.json(hold)
+})
+ 
 router.patch('/newcontrols', async (req, res) => {
 	const newControls = req.query
 	console.log(newControls)
 	const state = await simulation.setControls(newControls)
+	res.json(state)
+})
+
+router.patch('/deployerror', async (req, res) => {
+	const newFailure = req.query
+	console.log(newFailure)
+	const state = await simulation.setFailure(newFailure)
 	res.json(state)
 })
 
