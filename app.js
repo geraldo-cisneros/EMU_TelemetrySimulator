@@ -3,9 +3,12 @@ var bodyParser = require('body-parser')
 var mongoose = require('mongoose')
 var app = express()
 const simulationRouter = require('./routes/router')
+const uiaSimulationRouter = require('./routes/uiarouter')
 //Database connector
 mongoose.connect('mongodb://localhost/spacesuit')
 app.use('/api/simulation', simulationRouter)
+app.use('/api/simulation/', uiaSimulationRouter)
+
 
 //EJS framework for website display
 app.use(bodyParser.json())

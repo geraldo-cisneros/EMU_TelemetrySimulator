@@ -28,9 +28,9 @@ module.exports.start = async function(){
 		const started_at = new Date()
 		const state = await SimulationState.create({
 			time: 0,
-			timer: 0, 
+			timer: '00:00:00', 
 			started_at,
-			heart_bpm: 80,
+			heart_bpm: 0,
 			p_sub: 0,
 			t_sub: 0,
 			v_fan: 0,
@@ -38,27 +38,29 @@ module.exports.start = async function(){
 			rate_o2: 0,
 			cap_battery: 100,
 			battery_out: 100, 
-			t_battery: 3 * 60 * 60,
+			t_battery: '00:00:00',
 			p_h2o_g: 0,
 			p_h2o_l: 0,
 			p_sop: 0,
 			rate_sop:0 ,
 			t_oxygen: 100,
 			t_oxygenSec: 100,
-			ox_primary:100,
-			ox_secondary:100, 
-			t_water: 32,//ounces
+			ox_primary: 100,
+			ox_secondary: 100, 
+			o2_time: '00:00:00',
+			cap_water: 100,
+			t_water: '00:00:00'
 		})
 		simStateID = state._id 
 		const controls = await SimulationControl.create({
 			//names are temporary... change when switch functions are decided
 			started_at,
-			battery_switch: true,
+			battery_switch: false,
 			O2_switch: false,
 			switch3: false,
 			switch4: false,
 			switch5: false,
-			fan_switch: true,
+			fan_switch: false,
 		})
 		controlID = controls._id
 		const failure = await SimulationFailure.create({

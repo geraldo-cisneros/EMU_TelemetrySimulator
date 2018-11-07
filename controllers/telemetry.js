@@ -27,32 +27,10 @@ module.exports.simulationStep = function(dt, controls, failure, oldSimState){
 			t_oxygenSec: oxygenLife(dt, controls, oldSimState).t_oxygenSecondary,
 			ox_primary: oxygenLife(dt, controls, oldSimState).oxPrimar_out,
 			ox_secondary: oxygenLife(dt, controls, oldSimState).oxSecondary_out,
-			t_water: waterLife(dt, controls, oldSimState)
+			o2_time:oxygenLife(dt, controls, oldSimState).o2_time,
+			cap_water: waterLife(dt, controls, oldSimState).cap_water,
+			t_water: waterLife(dt, controls, oldSimState).t_water
 		}
-	else{
-		return{
-			time: 0,
-			heart_bpm: 0,
-			p_sub: 0, 
-			t_sub: 0, 
-			v_fan: 0, 
-			p_o2: 0, 
-			rate_o2: 0,
-			cap_battery,
-			battery_out,
-			t_battery,
-			p_h2o_g: 0,
-			p_h2o_l: 0,
-			p_sop: 0, 
-			rate_sop: 0,
-			t_oxygen: oldSimState.t_oxygen, 
-			t_oxygenSec: oldSimState.t_oxygenSec, 
-			ox_primary: 0,
-			ox_secondary: 0,
-			t_water: 0, 
-
-		}
-	}	
 }
 
 function padValues(n, width, z = '0') {
@@ -99,41 +77,46 @@ function batteryStep(dt, { battery_switch }, oldSimState){
 }
 
 function oxygenLife(dt, { O2_switch }, oldSimState){
-	// const totalBatteryCapacity = 3000 // Ah
-	// const totalBatteryLife_low = 60 * 60 * 3 // s
-	// const totalBatteryLife_high = 60 * 60 * 1 // s
-	// const drainRate_low = totalBatteryCapacity / totalBatteryLife_low
-	// const drainRate_high = totalBatteryCapacity / totalBatteryLife_high
-	// const drainRate = controls.switch1 ? drainRate_high : drainRate_low // kA/s
+
 	const ox_drainRate= 100 / ( 3 * 60 * 60) // 3 hours of life (%/s)
 	const amountDrained = ox_drainRate * ( dt / 1000)// %
 	let t_oxygenPrimary = oldSimState.t_oxygen
 	let t_oxygenSecondary = oldSimState.t_oxygenSec
-	
 
-	if (O2_switch || t_oxygenPrimary > 0){
+	if (O2_switch){
 		t_oxygenPrimary = ( t_oxygenPrimary - amountDrained ) // %
 	}
-	else{
+	else
+		t_oxygenSecondary = (t_oxygenSecondary - amountDrained)
+
+	if (O2_switch && t_oxygenPrimary <= 0){
 		t_oxygenPrimary = 0
 		t_oxygenSecondary = ( t_oxygenSecondary - amountDrained ) // %
 	}
 	if (t_oxygenSecondary <= 0){
 		t_oxygenSecondary = 0
 	}
+
+	const o2_time = secondsToHms ((t_oxygenPrimary / ox_drainRate) + (t_oxygenSecondary / ox_drainRate))
 	const oxPrimar_out = Math.floor(t_oxygenPrimary)
 	const oxSecondary_out = Math.floor(t_oxygenSecondary)
-	
-	return {t_oxygenPrimary, t_oxygenSecondary, oxPrimar_out, oxSecondary_out}
+
+	return {
+		t_oxygenPrimary, t_oxygenSecondary, oxPrimar_out, 
+		oxSecondary_out, o2_time, 
+	}
 }
 
 function waterLife(dt, controls, oldSimState){
-	const water_drainRate =  100 / ( 3 * 60 * 60) //(oz/s)
-	const amountDrained = water_drainRate * (dt / 1000)
-	let t_water = oldSimState.t_water - amountDrained
-	if (t_water <= 0 )
-		t_water = 0
-	return t_water.toFixed(2)
+	const drainRate = 100 / (5.5 * 60 * 60) // 4 hours of life (%/s)
+	let cap_water = oldSimState.cap_water
+	const amountDrained = drainRate * (dt / 1000) // %
+	const t_water = secondsToHms(cap_water / drainRate) // s
+	//console.log(cap_water)
+	cap_water = cap_water - amountDrained// %
+
+	return { cap_water, t_water, }
+
 }
 
 function heartBeat(dt, controls, {fan_error}, oldSimState){
@@ -168,10 +151,11 @@ function pressureSUB(){
 }
 
 function tempSub(){
-	const t_sub_max = 6 
-	const t_sub_min = 4 
+	const t_sub_max = 33
+	const t_sub_min = 31.5 
 	let t_sub = Math.random() * (t_sub_max - t_sub_min) + t_sub_min
-	return t_sub.toFixed(0) 
+	let t_sub_avg = (t_sub_max + t_sub_min + t_sub)/3 
+	return t_sub_avg.toFixed(2) 
 }
 
 function velocFan(dt, { fan_switch }, { fan_error }, oldSimState){
@@ -183,7 +167,7 @@ function velocFan(dt, { fan_switch }, { fan_error }, oldSimState){
 			v_fan = v_fan - 303 
 			return v_fan.toFixed(0)  
 		}
-		fan_max = 1789 
+		fan_max = 1789
 		fan_min = 879
 	} 
 	else if(fan_error === false && fan_switch === true) {
@@ -194,14 +178,16 @@ function velocFan(dt, { fan_switch }, { fan_error }, oldSimState){
 		v_fan = 0
 	}
 	v_fan = Math.random() * (fan_max - fan_min) + fan_min
-	return v_fan.toFixed(0)
+	return (v_fan/1000).toFixed(2)
 }
 
 function pressureOxygen(){
-	const oxPressure_max = 16 
-	const oxPressure_min = 15 
-	const p_o2 = Math.random() * (oxPressure_max- oxPressure_min) + oxPressure_min
-	return p_o2.toFixed(0) 
+	const oxPressure_max = 680 
+	const oxPressure_min = 635 
+	const p_o2 = Math.random() * (oxPressure_max - oxPressure_min) + oxPressure_min
+	let p_o2_avg = (p_o2 + oxPressure_max + oxPressure_min ) / 3
+
+	return p_o2_avg.toFixed(2) 
 }
 
 function rateOxygen(){
@@ -212,24 +198,25 @@ function rateOxygen(){
 }
 
 function pressureWaterGas(){
-	const gasPressure_max = 16 
-	const gasPressure_min = 15 
+	const gasPressure_max = 30 
+	const gasPressure_min = 28 
 	const p_h2o_g = Math.random() * (gasPressure_max - gasPressure_min) + gasPressure_min
-	return p_h2o_g.toFixed(0) 
+	return p_h2o_g.toFixed(2) 
 }
 
 function pressureWaterLiquid(){
-	const waterPressure_max = 16 
-	const waterPressure_min = 15 
+	const waterPressure_max = 30 
+	const waterPressure_min = 29 
 	const p_h2o_l = Math.random() * (waterPressure_max - waterPressure_min) + waterPressure_min
-	return p_h2o_l.toFixed(0) 
+	return p_h2o_l.toFixed(2) 
 }
 
 function pressureSOP(){
-	const sopPressure_max = 950 
-	const sopPressure_min = 850 
+	const sopPressure_max = 6100
+	const sopPressure_min = 6250
 	const p_sop = Math.random() * (sopPressure_max - sopPressure_min) + sopPressure_min
-	return p_sop.toFixed(0) 
+	const p_sop_avg = (sopPressure_max + sopPressure_min + p_sop) / 3
+	return p_sop_avg.toFixed(0) 
 }
 
 function rateSOP(){
@@ -238,20 +225,3 @@ function rateSOP(){
 	const rate_sop = Math.random() * (sopRate_max - sopRate_min) + sopRate_min
 	return rate_sop.toFixed(1) 
 }
-
-// /* module.exports.getSuitTelemetry = function(callback, data){
-// 	SuitData.find({}, function(err, data){
-// 		if (err) throw err; 
-// 		callback(data);
-// 	})
-// }; */
-
-// //Function to return all data from the database
-// module.exports.getSuitTelemetry = function (callback, limit) {
-// 	SuitData.find({},{_id:0, __v:0},callback)
-// }
-
-// //Function to return the most recently created dataset
-// module.exports.getSuitTelemetryByDate = function (callback, limit) {
-// 	SuitData.find({},{_id:0, __v:0},callback).sort({'create_date':-1}).limit(1)
-// }
