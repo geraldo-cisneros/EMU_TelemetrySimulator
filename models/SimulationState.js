@@ -8,7 +8,6 @@ var SimulationStateSchema = new mongoose.Schema({
 	p_sub: { type: String, required: true },
 	t_sub: { type: String, required: true },
 	v_fan: { type: String, required: true },
-	// t_eva: { type: String, required: true },
 	p_o2: { type: String, required: true },
 	rate_o2: { type: String, required: true },
 	cap_battery: { type: Number, required: true },
@@ -22,7 +21,9 @@ var SimulationStateSchema = new mongoose.Schema({
 	t_oxygenSec: { type: String, required: true },
 	ox_primary: { type: String, required: true },
 	ox_secondary: { type: String, required: true },
-	t_water: { type: Number, required: true },
+	o2_time: { type: String, required: true },
+	cap_water: { type: Number, required: true },
+	t_water: { type: String, required: true },
 })
 
 module.exports = mongoose.model('SimulationState', SimulationStateSchema,)
