@@ -1,5 +1,5 @@
 var mongoose = require('mongoose')
-const { simulationStepUIA } = require('./uia')
+const { simulationStepUIA } = require('../telemetry/uia_telemetry')
 var SimulationUIA = mongoose.model('SimulationUIA')
 var SimulationStateUIA = mongoose.model('SimulationStateUIA')
 

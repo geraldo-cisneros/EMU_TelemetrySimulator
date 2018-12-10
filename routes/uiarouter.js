@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 require('../models/SimulationSateUIA')
 require('../models/SimulationUIA')
 
-const uiaSimulation = require('../controllers/uiasimulation')
+const uiaSimulation = require('../simulations/uiasimulation')
 
 const router = express.Router()
 
