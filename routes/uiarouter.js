@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-require('../models/SimulationSateUIA')
+require('../models/SimulationStateUIA')
 require('../models/SimulationUIA')
 
 const uiaSimulation = require('../simulations/uiasimulation')

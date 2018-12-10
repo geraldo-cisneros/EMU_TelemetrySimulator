@@ -3,7 +3,6 @@ var Schema = mongoose.Schema
 
 var SimulationUIASchema = new Schema({
 	started_at: { type: Date, required: true },
-	//names are temporary... change when switch functions are decided
 	emu_on_off:{ type: Boolean, required: true },
 	supply:{ type: Boolean, required: true },
 	waste:{ type: Boolean, required: true },
