@@ -49,18 +49,18 @@ ROUTES:
   
     Sets HTTP request methods for UIA portion of the simulation. 
   
-Simulations:
+SIMULATIONS:
 
-  evasimulation.js
+   evasimulation.js
   
-    This is where the simulation takes place for the EVA. EVA data is updated and sent to the database here.
+      This is where the simulation takes place for the EVA. EVA data is updated and sent to the database here.
   
-  uiasimulation.js
+   uiasimulation.js
      
      This is where the simulation takes place for the UIA. UIA data is updated and sent to the database here.
   
   
-Telemetry:
+TELEMETRY:
 
   eva_telemetry.js
     
