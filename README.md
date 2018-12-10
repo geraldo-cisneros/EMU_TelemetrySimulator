@@ -52,12 +52,23 @@ ROUTES:
 Simulations:
 
   evasimulation.js
+  
+    This is where the simulation takes place for the EVA. EVA data is updated and sent to the database here.
+  
   uiasimulation.js
-
+     
+     This is where the simulation takes place for the UIA. UIA data is updated and sent to the database here.
+  
+  
 Telemetry:
 
   eva_telemetry.js
+    
+    All EVA Telemetry Data is generated here
+ 
   uia_telemetry.js
+    
+    All UIA Telemetry Data is generated here
 
 
 
