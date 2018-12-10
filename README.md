@@ -53,7 +53,7 @@ SIMULATIONS:
 
    evasimulation.js
   
-      This is where the simulation takes place for the EVA. EVA data is updated and sent to the database here.
+     This is where the simulation takes place for the EVA. EVA data is updated and sent to the database here.
   
    uiasimulation.js
      
