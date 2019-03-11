@@ -25,23 +25,36 @@ module.exports.uiaStart = async function(){
 		const started_at = new Date()
 		const uia = await SimulationUIA.create({
 			started_at,
-			emu_on_off: false,
-			supply: false,
-			waste: false,
-			oxygen: false,
-			o2_vent: false,
-			switch3: false,
+			emu1: false,
+			ev1_supply: false,
+			ev1_waste: false,
+			emu1_O2: false,
+			emu2: false,
+			ev2_supply: false,
+			ev2_waste: false,
+			emu2_O2: false,
+			O2_vent: false,
+			depress_pump: false,
 		})
 		uiaID = uia._id
 		const uiaSimState = await SimulationStateUIA.create({
 			started_at,
-			emu_onOff: 'OFF',
-			o2_supply_pressure: 0,
-			water_supply: 0,
-			waste_water: 'CLOSED',
-			oxygen_supply: 0,
-			oxygen_supp_out: 0,
-			o2_vent: 'CLOSED',
+			emu1: 'OFF',
+			emu2: 'OFF',
+			o2_supply_pressure1: 0,
+			o2_supply_pressure2: 0, 
+			ev1_supply: 0,
+			ev2_supply: 0,
+			ev1_waste: 'CLOSED',
+			ev2_waste: 'CLOSED',
+			emu1_O2: 0,
+			emu2_O2: 0,
+			oxygen_supply1: 0,
+			oxygen_supp_out1: 0,
+			oxygen_supply2: 0,
+			oxygen_supp_out2: 0,
+			O2_vent: 'CLOSED',
+			depress_pump: 'FAULT'
 		})
 		uiaSimStateID = uiaSimState._id
 		console.log('--------------UIA Simulation Started--------------')
@@ -96,7 +109,7 @@ module.exports.getUIAControls = async function(){
 	return controls 
 }
 
-module.exports.setUIA = async function(newControls){
+module.exports.setUIAControls = async function(newControls){
 	const controls = await SimulationUIA.findByIdAndUpdate(uiaID, newControls, {new: true}).exec()
 	return controls 
 }

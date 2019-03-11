@@ -79,7 +79,7 @@ router.get('/state', async (req, res) => {
 	catch(error){
 		console.error('failed to start get state')
 		console.error(error.toString())
-		res.sendStatus(500)
+		res.sendStatus(500) 
 	}
 })
 router.get('/failure', async (req, res) => {

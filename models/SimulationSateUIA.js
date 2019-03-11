@@ -3,13 +3,22 @@ var Schema = mongoose.Schema
 
 var SimulationStateUIASchema = new Schema({
 	started_at: { type: Date, required: true },
-	emu_onOff: { type: String, required: true },
-	o2_supply_pressure: { type: Number, required: true },
-	water_supply: { type: Number, required: true },
-	waste_water: { type: String, required: true },
-	oxygen_supply: { type: Number, required: true },
-	oxygen_supp_out: { type: Number, required: true },
-	o2_vent: { type: String, required: true },
+	emu1: { type: String, required: true },
+	emu2: { type: String, required: true },
+	o2_supply_pressure1: { type: Number, required: true },
+	o2_supply_pressure2: { type: Number, required: true },
+	ev1_supply: { type: Number, required: true },
+	ev2_supply: { type: Number, required: true },
+	ev1_waste: { type: String, required: true },
+	ev2_waste: { type: String, required: true },
+	emu1_O2: { type: Number, required: true },
+	emu2_O2: { type: Number, required: true },
+	oxygen_supply1: { type: Number, required: true },
+	oxygen_supp_out1: { type: Number, required: true },
+	oxygen_supply2: { type: Number, required: true },
+	oxygen_supp_out2: { type: Number, required: true },
+	O2_vent: { type: String, required: true },
+	depress_pump: { type: String, required: true }
 
 })
 module.exports = mongoose.model('SimulationStateUIA', SimulationStateUIASchema)

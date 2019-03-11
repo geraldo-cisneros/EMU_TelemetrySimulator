@@ -84,7 +84,7 @@ router.get('/uiastate', async (req, res) => {
 
 router.get('/uiacontrols', async (req, res) => {
 	try{
-		const controls = await uiaSimulation.getUIAControls()
+		const controls = await uiasimulation.getUIAControls()
 		res.json(controls)
 	}
 	catch(error){
@@ -97,7 +97,7 @@ router.get('/uiacontrols', async (req, res) => {
 router.patch('/newuiacontrols', async (req, res) => {
 	const newControls = req.query
 	console.log(newControls)
-	const state = await uiaSimulation.setUIA(newControls)
+	const state = await uiaSimulation.setUIAControls(newControls)
 	res.json(state)
 })
 
