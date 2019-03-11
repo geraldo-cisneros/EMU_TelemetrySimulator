@@ -1,9 +1,8 @@
 var mongoose = require('mongoose')
-const { simulationStep } = require('./telemetry')
+const { simulationStep } = require('../telemetry/eva_telemetry')
 var SimulationState = mongoose.model('SimulationState')	
 var SimulationControl = mongoose.model('SimulationControl')
 var SimulationFailure = mongoose.model('SimulationFailure')
-var SimulationHold = mongoose.model('SimulationHold')
 
 let simTimer = null
 let simStateID = null
@@ -68,11 +67,7 @@ module.exports.start = async function(){
 			fan_error: false, 
 		})
 		failureID = failure._id
-		const hold = await SimulationHold.create({
-			started_at,
-			handhold: 0, 
-		})
-		holdID = hold._id
+
 
 		console.log('--------------Simulation Started--------------')
 		lastTimestamp = Date.now()
@@ -142,19 +137,12 @@ module.exports.setControls = async function(newControls){
 	return controls 
 }
 
-module.exports.setHold = async function(newHold){
-	const hold = await SimulationHold.findByIdAndUpdate(holdID, newHold, {new: true}).exec()
-	console.log(hold)
-	console.log('set hold click worked')
-	return hold 
-}
-
 async function step(){
 	try{
 		const simState = await SimulationState.findById(simStateID).exec()
 		const controls = await SimulationControl.findById(controlID).exec()
 		const failure = await SimulationFailure.findById(failureID).exec()
-		// const hold = await SimulationHold.findById(holdID).exec()
+
 		const now = Date.now()
 		const dt = now - lastTimestamp 
 		lastTimestamp = now

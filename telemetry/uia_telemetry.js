@@ -1,6 +1,7 @@
 
 module.exports.simulationStepUIA = function(dt, uiaControls, uiaOldSimState){
 
+<<<<<<< HEAD:controllers/uia.js
 	// const cap_battery = batteryStep(dt, controls, oldSimState).cap_battery
 	// const t_battery = batteryStep(dt, controls, oldSimState).t_battery
 	// const battery_out = batteryStep(dt, controls, oldSimState).battery_out
@@ -11,6 +12,13 @@ module.exports.simulationStepUIA = function(dt, uiaControls, uiaOldSimState){
 	return {
 			emu1 = emuOnOff(dt, uiaControls, uiaOldSimState).onOff1,
 			emu2 = emuOnOff(dt, uiaControls, uiaOldSimState).onOff2,
+=======
+	const emu_onOff = emuOnOff(dt, uiaControls, uiaOldSimState)
+	
+	if (uiaControls.emu_on_off === true)
+		return {
+			emu_onOff,
+>>>>>>> ccb6a201406ab36979596a1df295111a058bf060:telemetry/uia_telemetry.js
 			o2_supply_pressure: o2SupplyPressure(dt, uiaControls, uiaOldSimState).o2_pressure, 
 			oxygen_supp_out: o2SupplyPressure(dt, uiaControls, uiaOldSimState).o2_pressure_out,
 			ev1_supply: supplyWater(dt, uiaControls, uiaOldSimState).water_supply1,
@@ -24,10 +32,6 @@ module.exports.simulationStepUIA = function(dt, uiaControls, uiaOldSimState){
 		}
 }
 
-// function padValues(n, width, z = '0') {
-// 	n = n.toString()
-// 	return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n
-// }
 
 function emuOnOff(dt, uiaControls, uiaOldSimState) {
 	let emu1 = uiaOldSimState.emu1

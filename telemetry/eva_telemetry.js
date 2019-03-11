@@ -55,21 +55,11 @@ function missionTimer(dt , controls, oldSimState){
 }
 
 function batteryStep(dt, { battery_switch }, oldSimState){
-	// const totalBatteryCapacity = 3000 // Ah
-	// const totalBatteryLife_low = 60 * 60 * 3 // s
-	// const totalBatteryLife_high = 60 * 60 * 1 // s
-	// const drainRate_low = totalBatteryCapacity / totalBatteryLife_low
-	// const drainRate_high = totalBatteryCapacity / totalBatteryLife_high
-	// const drainRate = controls.battery_switch ? drainRate_high : drainRate_low // kA/s
-	//const drainRate_high = 100 / (2 * 60 * 60) // 2 hours of battery life (%/s)
-	//const drainRate = battery_switch ? drainRate_high : drainRate_low // %/s
-	
 	const drainRate = 100 / (4 * 60 * 60) // 4 hours of life (%/s)
 	let cap_battery = oldSimState.cap_battery
 	const amountDrained = drainRate * (dt / 1000) // %
 	const t_battery = secondsToHms(cap_battery / drainRate) // s
 	const battery_out = Math.floor(cap_battery)
-	//console.log(cap_battery)
 	if (battery_switch){
 		cap_battery = cap_battery - amountDrained// %
 	}
@@ -108,11 +98,10 @@ function oxygenLife(dt, { O2_switch }, oldSimState){
 }
 
 function waterLife(dt, controls, oldSimState){
-	const drainRate = 100 / (5.5 * 60 * 60) // 4 hours of life (%/s)
+	const drainRate = 100 / (5.5 * 60 * 60) // 5.5 hours of life (%/s)
 	let cap_water = oldSimState.cap_water
 	const amountDrained = drainRate * (dt / 1000) // %
 	const t_water = secondsToHms(cap_water / drainRate) // s
-	//console.log(cap_water)
 	cap_water = cap_water - amountDrained// %
 
 	return { cap_water, t_water, }
@@ -136,9 +125,6 @@ function heartBeat(dt, controls, {fan_error}, oldSimState){
 	}
 	const heart_bpm = Math.random() * (hr_max - hr_min) + hr_min
 	let hr_mean = (oldSimState.heart_bpm + heart_bpm) / 2
-	// if (hr_mean < 81){
-	// 	hr_mean = 86
-	// }
 	const avg_hr = (heart_bpm + hr_max + hr_mean + hr_min) / 4
 	return avg_hr.toFixed(0) 
 }
