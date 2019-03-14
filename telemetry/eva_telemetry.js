@@ -8,6 +8,7 @@ module.exports.simulationStep = function(dt, controls, failure, oldSimState){
 	if (controls.battery_switch) //determines whether the Suit is on/off
 	// SimulationState.create({
 		return {
+		
 			time: missionTimer(dt, controls, oldSimState).time,
 			timer: missionTimer(dt, controls, oldSimState).timer, 
 			heart_bpm: heartBeat(dt, controls, failure, oldSimState),
@@ -30,6 +31,7 @@ module.exports.simulationStep = function(dt, controls, failure, oldSimState){
 			o2_time:oxygenLife(dt, controls, oldSimState).o2_time,
 			cap_water: waterLife(dt, controls, oldSimState).cap_water,
 			t_water: waterLife(dt, controls, oldSimState).t_water
+	
 		}
 }
 
@@ -130,18 +132,19 @@ function heartBeat(dt, controls, {fan_error}, oldSimState){
 }
 
 function pressureSUB(){
-	const p_sub_max = 7.99 
-	const p_sub_min = 7.85 
+	
+	const p_sub_max = 4 
+	const p_sub_min = 3.85 
 	let p_sub = Math.random() * (p_sub_max - p_sub_min) + p_sub_min
 	return p_sub.toFixed(2) 
 }
 
 function tempSub(){
-	const t_sub_max = 33
+	const t_sub_max = 32
 	const t_sub_min = 31.5 
 	let t_sub = Math.random() * (t_sub_max - t_sub_min) + t_sub_min
 	let t_sub_avg = (t_sub_max + t_sub_min + t_sub)/3 
-	return t_sub_avg.toFixed(2) 
+	return t_sub_avg.toFixed(1) 
 }
 
 function velocFan(dt, { fan_switch }, { fan_error }, oldSimState){
@@ -150,7 +153,7 @@ function velocFan(dt, { fan_switch }, { fan_error }, oldSimState){
 	let fan_min = 0
 	if (fan_error === true && fan_switch === true) { 
 		if (v_fan > 2000){
-			v_fan = v_fan - 303 
+			v_fan = v_fan - 1039 
 			return v_fan.toFixed(0)  
 		}
 		fan_max = 1789
@@ -168,8 +171,8 @@ function velocFan(dt, { fan_switch }, { fan_error }, oldSimState){
 }
 
 function pressureOxygen(){
-	const oxPressure_max = 680 
-	const oxPressure_min = 635 
+	const oxPressure_max = 780 
+	const oxPressure_min = 770 
 	const p_o2 = Math.random() * (oxPressure_max - oxPressure_min) + oxPressure_min
 	let p_o2_avg = (p_o2 + oxPressure_max + oxPressure_min ) / 3
 
@@ -178,28 +181,28 @@ function pressureOxygen(){
 
 function rateOxygen(){
 	const oxRate_max = 1 
-	const oxRate_min = 0.8 
+	const oxRate_min = 0.5 
 	const rate_o2 = Math.random() * (oxRate_max - oxRate_min) + oxRate_min
 	return rate_o2.toFixed(1) 
 }
 
 function pressureWaterGas(){
-	const gasPressure_max = 30 
-	const gasPressure_min = 28 
+	const gasPressure_max = 16 
+	const gasPressure_min = 14 
 	const p_h2o_g = Math.random() * (gasPressure_max - gasPressure_min) + gasPressure_min
 	return p_h2o_g.toFixed(2) 
 }
 
 function pressureWaterLiquid(){
-	const waterPressure_max = 30 
-	const waterPressure_min = 29 
+	const waterPressure_max = 14 
+	const waterPressure_min = 16 
 	const p_h2o_l = Math.random() * (waterPressure_max - waterPressure_min) + waterPressure_min
 	return p_h2o_l.toFixed(2) 
 }
 
 function pressureSOP(){
-	const sopPressure_max = 6100
-	const sopPressure_min = 6250
+	const sopPressure_max = 850
+	const sopPressure_min = 910
 	const p_sop = Math.random() * (sopPressure_max - sopPressure_min) + sopPressure_min
 	const p_sop_avg = (sopPressure_max + sopPressure_min + p_sop) / 3
 	return p_sop_avg.toFixed(0) 
@@ -207,7 +210,7 @@ function pressureSOP(){
 
 function rateSOP(){
 	const sopRate_max = 1 
-	const sopRate_min = 0.9 
+	const sopRate_min = 0.6 
 	const rate_sop = Math.random() * (sopRate_max - sopRate_min) + sopRate_min
 	return rate_sop.toFixed(1) 
 }

@@ -49,6 +49,7 @@ module.exports.start = async function(){
 			o2_time: '00:00:00',
 			cap_water: 100,
 			t_water: '00:00:00'
+		
 		})
 		simStateID = state._id 
 		const controls = await SimulationControl.create({
