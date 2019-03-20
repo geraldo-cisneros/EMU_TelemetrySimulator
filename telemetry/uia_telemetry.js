@@ -26,7 +26,6 @@ module.exports.simulationStepUIA = function(dt, uiaControls, uiaOldSimState){
 	}
 }
 
-
 function emuOnOff(dt, uiaControls, uiaOldSimState) {
 	let emu1 = uiaControls.emu1
 	let emu2 = uiaControls.emu2
@@ -48,7 +47,7 @@ function emuOnOff(dt, uiaControls, uiaOldSimState) {
 
 }
 function o2SupplyPressure(dt, uiaControls, uiaOldSimState) {
-	const oxygen_fillRate =  3500/ ( 1 * 60) //(oz/s)
+	const oxygen_fillRate =  3500/ ( .5 * 60) //(oz/s)
 	const amountFilled = oxygen_fillRate * (dt / 1000)
 	const max_o2_psi = 3500
 	let o2_pressure1 = uiaOldSimState.o2_supply_pressure1
@@ -57,17 +56,17 @@ function o2SupplyPressure(dt, uiaControls, uiaOldSimState) {
 	if (o2_pressure1 < max_o2_psi && uiaControls.emu1_O2 === true && uiaControls.O2_vent === false)
 		o2_pressure1 = o2_pressure1 + amountFilled
 	
-	else if (o2_pressure1 <= max_o2_psi && uiaControls.emu1_O2 === false  && uiaControls.O2_vent === true){
-		o2_pressure1 -= 19
+	else if (uiaControls.emu1_O2 === false  && uiaControls.O2_vent === true){
+		o2_pressure1 -= oxygen_fillRate
 		if (o2_pressure1 <=21)
 			o2_pressure1 = 21
 	}
 
-	if (o2_pressure2 < max_o2_psi && uiaControls.emu2_O2 === true && uiaControls.O2_vent === false)
+	else if (o2_pressure2 < max_o2_psi && uiaControls.emu2_O2 === true && uiaControls.O2_vent === false)
 		o2_pressure2 = o2_pressure2 + amountFilled
 
-	else if (o2_pressure2 <= max_o2_psi && uiaControls.emu2_O2 === false  && uiaControls.O2_vent === true){
-		o2_pressure2 -= 19
+	else if (uiaControls.emu2_O2 === false  && uiaControls.O2_vent === true){
+		o2_pressure2 -= oxygen_fillRate
 		if (o2_pressure2 <=21)
 			o2_pressure2 = 21
 	}
@@ -129,7 +128,6 @@ function supplyWaterStatus(dt, uiaControls, uiaOldSimState) {
 	return {water1,water2}
 }
 
-
 function wasteWater(dt, uiaControls, uiaOldSimState) {
 	let waste_water1 = uiaOldSimState.ev1_waste
 	let waste_water2 = uiaOldSimState.ev2_waste
@@ -149,7 +147,6 @@ function wasteWater(dt, uiaControls, uiaOldSimState) {
 	
 	return {waste_water1,waste_water2}
 }
-
 
 function oxygen(dt, uiaControls,uiaOldSimState) {
 	let oxygen_status1 = uiaOldSimState.emu1_O2
