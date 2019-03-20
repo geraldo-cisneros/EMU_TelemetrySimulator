@@ -84,7 +84,7 @@ router.get('/uiastate', async (req, res) => {
 
 router.get('/uiacontrols', async (req, res) => {
 	try{
-		const controls = await uiasimulation.getUIAControls()
+		const controls = await uiaSimulation.getUIAControls()
 		res.json(controls)
 	}
 	catch(error){

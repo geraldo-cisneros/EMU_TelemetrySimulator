@@ -1,6 +1,7 @@
 var mongoose = require('mongoose')
 
 var SimulationStateSchema = new mongoose.Schema({
+	
 	time: { type: Number, required: true }, 
 	timer: { type: String, required: true }, 
 	started_at: { type: Date, required: true },
@@ -24,6 +25,7 @@ var SimulationStateSchema = new mongoose.Schema({
 	o2_time: { type: String, required: true },
 	cap_water: { type: Number, required: true },
 	t_water: { type: String, required: true },
+
 })
 
 module.exports = mongoose.model('SimulationState', SimulationStateSchema,)
