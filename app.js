@@ -26,7 +26,9 @@ app.use((req,res,next) =>{
 	)
 	next()
 })
+app.set('port', (process.env.PORT || 3000))
 app.set('view engine', 'ejs') 
 app.use('/assets', express.static('assets'))
-//app.listen(3000) //listen to port 3000
-console.log('Server is running on port 3000...')
+app.listen(app.get('port'), function(){
+	console.log('Node app is running on port', app.get('port'))
+}) //listen to port 3000
