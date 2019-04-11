@@ -28,9 +28,5 @@ app.use((req,res,next) =>{
 })
 app.set('view engine', 'ejs') 
 app.use('/assets', express.static('assets'))
-app.get('/', function(res, req, next){
-	res.render('view1')
-})
-
 app.listen(3000) //listen to port 3000
 console.log('Server is running on port 3000...')
