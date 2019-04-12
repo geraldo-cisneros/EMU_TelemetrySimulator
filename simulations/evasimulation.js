@@ -31,6 +31,7 @@ module.exports.start = async function(){
 			started_at,
 			heart_bpm: 0,
 			p_sub: 0,
+			p_suit: 0, 
 			t_sub: 0,
 			v_fan: 0,
 			p_o2: 0,
@@ -42,11 +43,11 @@ module.exports.start = async function(){
 			p_h2o_l: 0,
 			p_sop: 0,
 			rate_sop:0 ,
-			t_oxygen: 100,
+			t_oxygenPrimary: 100,
 			t_oxygenSec: 100,
 			ox_primary: 100,
 			ox_secondary: 100, 
-			o2_time: '00:00:00',
+			t_oxygen: '00:00:00',
 			cap_water: 100,
 			t_water: '00:00:00'
 		
