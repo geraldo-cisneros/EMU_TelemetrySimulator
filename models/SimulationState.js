@@ -12,6 +12,7 @@ var SimulationStateSchema = new mongoose.Schema({
 	v_fan: { type: String, required: true },
 	p_o2: { type: String, required: true },
 	rate_o2: { type: String, required: true },
+	batteryPercent: {type: Number, required: true}, 
 	cap_battery: { type: Number, required: true },
 	battery_out: { type: Number, required: true },
 	p_h2o_g: { type: String, required: true },

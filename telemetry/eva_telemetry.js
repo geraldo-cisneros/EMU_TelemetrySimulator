@@ -1,7 +1,7 @@
 
 module.exports.simulationStep = function(dt, controls, failure, oldSimState){
 
-	const cap_battery = batteryStep(dt, controls, oldSimState).cap_battery
+	const batteryPercent = batteryStep(dt, controls, oldSimState).batteryPercent
 	const t_battery = batteryStep(dt, controls, oldSimState).t_battery
 	const battery_out = batteryStep(dt, controls, oldSimState).battery_out
 
@@ -18,7 +18,8 @@ module.exports.simulationStep = function(dt, controls, failure, oldSimState){
 			v_fan: velocFan(dt, controls, failure, oldSimState),
 			p_o2: pressureOxygen(dt, controls, oldSimState),
 			rate_o2: rateOxygen(dt, controls, oldSimState),
-			cap_battery,
+			cap_battery: capacityBattery(dt, controls, oldSimState),
+			batteryPercent, 
 			battery_out,
 			t_battery,
 			p_h2o_g: pressureWaterGas(dt, controls, oldSimState),
@@ -59,14 +60,21 @@ function missionTimer(dt , controls, oldSimState){
 
 function batteryStep(dt, { battery_switch }, oldSimState){
 	const drainRate = 100 / (4 * 60 * 60) // 4 hours of life (%/s)
-	let cap_battery = oldSimState.cap_battery
+	let batteryPercent = oldSimState.batteryPercent
 	const amountDrained = drainRate * (dt / 1000) // %
-	const t_battery = secondsToHms(cap_battery / drainRate) // s
-	const battery_out = Math.floor(cap_battery)
+	const t_battery = secondsToHms(batteryPercent / drainRate) // s
+	const battery_out = Math.floor(batteryPercent)
 	if (battery_switch === false){
-		cap_battery = cap_battery - amountDrained// %
+		batteryPercent = batteryPercent - amountDrained// %
 	}
-	return { cap_battery , t_battery, battery_out}
+	return { batteryPercent , t_battery, battery_out}
+}
+
+function capacityBattery(){
+	const batt_max = 30 
+	const batt_min = 29.4 
+	let cap_battery = Math.random() * (batt_max - batt_min) + batt_min
+	return cap_battery.toFixed(0) 
 }
 
 function oxygenLife(dt, { O2_switch }, oldSimState){
