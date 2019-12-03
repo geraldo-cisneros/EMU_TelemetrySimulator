@@ -9,7 +9,7 @@
   "author": "Geraldo Cisneros",
   "license": "ISC",
   "dependencies": {
-    "angular": "^1.7.4",
+    "angular": "^1.7.9",
     "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
